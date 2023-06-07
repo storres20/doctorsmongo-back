@@ -1,5 +1,7 @@
 const express = require('express');
 const Model = require('../models/doctor.model');
+const DoctorModel = require('../models/doctor.model');
+const AppointmentModel = require('../models/appointment.model');
 
 const router = express.Router()
 
@@ -76,14 +78,17 @@ router.patch('/:id', async (req, res) => {
 
 //Delete by ID Method
 router.delete('/:id', async (req, res) => {
-  //res.send('Delete by ID API')
-
   try {
     const id = req.params.id;
-    const data = await Model.findByIdAndDelete(id)
-    res.send(`Document with DNI ${data.dni} has been deleted..`)
+
+    // Eliminar el doctor
+    const deletedDoctor = await DoctorModel.findByIdAndDelete(id);
+
+    // Eliminar los APPOINTMENT relacionados con el doctor_id
+    await AppointmentModel.deleteMany({ doctor_id: id });
+
+    res.send(`Doctor with ID ${id} has been deleted, and related appointments have been removed.`);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
-  catch (error) {
-    res.status(400).json({ message: error.message })
-  }
-})
+});
