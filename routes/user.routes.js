@@ -1,5 +1,7 @@
 const express = require('express');
 const Model = require('../models/user.model');
+const UserModel = require('../models/user.model');
+const AppointmentModel = require('../models/appointment.model');
 
 const router = express.Router()
 
@@ -10,9 +12,7 @@ router.post('/create', async (req, res) => {
   //res.send('Post API')
 
   const data = new Model({
-    user: req.body.user,
     username: req.body.username,
-    password: req.body.password
   })
 
   try {
@@ -29,8 +29,7 @@ router.post('/', async (req, res) => {
   //res.send('Post API')
 
   data = {
-    username: req.body.username,
-    password: req.body.password
+    username: req.body.username
   }
 
   try {
@@ -42,7 +41,7 @@ router.post('/', async (req, res) => {
         message: "Intente de nuevo"
       })
     }
-    else if (data2.username === data.username && data2.password === data.password) {
+    else if (data2.username === data.username) {
       res.json({
         status: 1,
         message: "success"
@@ -104,14 +103,17 @@ router.patch('/:id', async (req, res) => {
 
 //Delete by ID Method
 router.delete('/:id', async (req, res) => {
-  //res.send('Delete by ID API')
-
   try {
     const id = req.params.id;
-    const data = await Model.findByIdAndDelete(id)
-    res.send(`Document with ${data.name} has been deleted..`)
+
+    // Eliminar el usuario
+    const deletedUser = await UserModel.findByIdAndDelete(id);
+
+    // Eliminar los APPOINTMENT relacionados con el user_id
+    await AppointmentModel.deleteMany({ user_id: id });
+
+    res.send(`User with ID ${id} has been deleted, and related appointments have been removed.`);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
-  catch (error) {
-    res.status(400).json({ message: error.message })
-  }
-})
+});
