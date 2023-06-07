@@ -11,7 +11,7 @@ const dataSchema = new mongoose.Schema({
     },
     speciality: {
         required: true,
-        type: Number
+        type: String
     },
     experience: {
         required: true,
