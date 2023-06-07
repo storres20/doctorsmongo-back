@@ -3,10 +3,9 @@ require('dotenv').config();
 const express = require('express'); // Server
 const cors = require("cors");
 
-const products = require('./routes/product.routes');
-const login = require('./routes/login.routes');
-const categories = require('./routes/category.routes');
-const dates = require('./routes/date.routes');
+const doctors = require('./routes/doctor.routes');
+const users = require('./routes/user.routes');
+const appointments = require('./routes/appointment.routes');
 
 const mongoose = require('mongoose');
 const mongoString = process.env.DATABASE_URL;
@@ -15,7 +14,7 @@ const mongoString = process.env.DATABASE_URL;
 // Database connection - mongodb
 mongoose.set("strictQuery", false);
 
-mongoose.connect(mongoString, { dbName: "pacientes" });
+mongoose.connect(mongoString, { dbName: "doctors" });
 const database = mongoose.connection;
 
 database.on('error', (error) => {
@@ -35,21 +34,20 @@ app.use(express.json());
 // Cors
 var corsOptions = {
     //origin: "http://localhost:3000" //frontend
-    origin: "https://pacientes20.netlify.app" //frontend
+    origin: "https://doctorsfinal.netlify.app" //frontend
 };
 
 app.use(cors(corsOptions));
 
 // simple route
 app.get("/", async (req, res) => {
-    res.json({ message: "Welcome to Back-End application." });
+    res.json({ message: "Welcome to Doctor's appointment Back-End application." });
 });
 
 // Routes
-app.use('/api/products', products)
-app.use('/api/login', login)
-app.use('/api/categories', categories)
-app.use('/api/dates', dates)
+app.use('/api/v1/doctors', doctors)
+app.use('/api/v1/users', users)
+app.use('/api/v1/appointments', appointments)
 
 app.listen(3001, () => {
     console.log(`Server Started at ${3001}`)
